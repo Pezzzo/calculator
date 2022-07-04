@@ -6,7 +6,7 @@ const outputValue = document.querySelector('.current-operations-field');
 const signMultiply = document.querySelector('.button-multiply');
 const signdivide = document.querySelector('.button-divide');
 const signminus = document.querySelector('.button-minus');
-const displayOperations = document.querySelector('.operations-field');
+const outputFieldDisplay = document.querySelector('.operations-field');
 const positiveNegativeButton = document.querySelector('.button-positive-negative');
 const lastValueOfNumber = document.querySelector('.del-one-char');
 const square = document.querySelector('.square');
@@ -28,32 +28,55 @@ let stack = [];
 let displayOutput = [];
 
 let newNumber = false;
-// let equals = false;
+let equals = false;
+let additionalOperations = false;
+let resultOperationSquare = 0;
 let currentNumber = 0;
 let intermediateNumber;
 let sign = '';
-let lastSign = '';
-
+let string = '';
 
 const buttonHandler = (value) => {
-  // if (equals) {
-  //   displayOutput = ['0'];
-  //   return;
-  // }
-  displayOutput.push(value);
+  const lastValue = value;
+
+  if (outputValue.textContent === '0' && value === 'plusmn') {
+    return
+  }
+
+  if (
+    outputFieldDisplay.textContent.includes('(-)') && value === 'plusmn' ||
+    outputFieldDisplay.textContent.includes('=') ||
+    outputFieldDisplay.textContent.includes('square') && sign === '' ||
+    outputFieldDisplay.textContent.includes('%') && lastValue === '%' ||
+    outputFieldDisplay.textContent.includes('square root') && sign === ''
+    ) {
+      return;
+    }
+
+    outputFieldDisplay.textContent === '0' && value !== '.' ?
+    outputFieldDisplay.textContent = value : outputFieldDisplay.textContent += value;
+
+    string = outputFieldDisplay.textContent;
+
+
+  if (value === 'plusmn') {
+    if (currentNumber.includes('-')) {
+      outputFieldDisplay.textContent = string.replace(/plusmn/g, '(-)');
+    }
+    return;
+  }
 };
 
 // ввод чисел
 const buttonNumberHaandler = (number) => {
-  if (lastSign === '=') {
+  if (equals) {
     cleanAllHandler();
   }
-  // equals = true;
   if (number === '.' && outputValue.textContent.includes('.')) {
     return;
   }
   if (!newNumber) {
-    outputValue.textContent === '0' && number !== '.'?
+    outputValue.textContent === '0' && number !== '.' ?
       outputValue.textContent = number : outputValue.textContent += number;
     currentNumber = outputValue.textContent;
   } else {
@@ -85,7 +108,10 @@ const buttonOperationHandler = (operation) => {
 // получение результата
 const resultButtonHandler = () => {
 
-  if (currentNumber === 0 || lastSign === '=') {
+  if (currentNumber === 0 || equals) {
+    input = [];
+    output = [];
+    stack = [];
     return;
   }
   currentNumber = outputValue.textContent;
@@ -102,8 +128,7 @@ const resultButtonHandler = () => {
   }
   outputValue.textContent = getOperationResult(output);
   sign = '';
-  lastSign = '=';
-  // equals = false;
+  equals = true;
 }
 
 // получение обратной нотации
@@ -167,24 +192,40 @@ const getOperationResult = (output) => {
   return +outputValue.textContent;
 };
 
-const squareHandler = () => {
-  outputValue.textContent = Math.pow(outputValue.textContent, 2).toFixed(10);
+let getResultOperationSquare = (num) => {
+  if (additionalOperations) {
+    return;
+  }
+  if (!Number.isInteger(num)) {
+    outputValue.textContent = +num.toFixed(10);
+  } else {
+    outputValue.textContent = num;
+  }
   currentNumber = +outputValue.textContent;
+  additionalOperations = true;
+};
+
+const squareHandler = () => {
+  resultOperationSquare = Math.pow(outputValue.textContent, 2);
+  getResultOperationSquare(resultOperationSquare);
+  additionalOperations = true;
 };
 
 const squareRootHandler = () => {
-  outputValue.textContent = Math.sqrt(outputValue.textContent).toFixed(10);
-  currentNumber = +outputValue.textContent;
-
+  resultOperationSquare = Math.sqrt(outputValue.textContent);
+  getResultOperationSquare(resultOperationSquare);
+  additionalOperations = true;
 };
 
 // общий сброс
 const cleanAllHandler = () => {
   outputValue.textContent = '0';
+  outputFieldDisplay.textContent = '0';
+  displayOutput = [];
   newNumber = false;
+  equals = false;
+  additionalOperations = false;
   currentNumber = 0;
-  lastSign = '';
-  // equals = '';
   sign = '';
   input = [];
   output = [];
@@ -197,14 +238,20 @@ const lastValueOfNumberHandler = () => {
   outputValue.textContent.length <= 1 ?
     intermediateNumber = 0 : intermediateNumber += outputValue.textContent.slice(0, -1);
   outputValue.textContent = intermediateNumber;
+  outputFieldDisplay.textContent = outputFieldDisplay.textContent.substring(0, outputFieldDisplay.textContent.length - 1);
   currentNumber = outputValue.textContent;
   intermediateNumber = '';
 };
 
-positiveNegativeButton.addEventListener('click', () => {
+const positiveNegativeButtonHandler = () => {
   outputValue.textContent = -outputValue.textContent;
   currentNumber = outputValue.textContent;
-});
+  string = outputFieldDisplay.textContent;
+
+  console.log(string);
+};
+
+positiveNegativeButton.addEventListener('click', () => positiveNegativeButtonHandler());
 
 squareRoot.addEventListener('click', () => squareRootHandler());
 square.addEventListener('click', () => squareHandler());
@@ -213,16 +260,15 @@ result.addEventListener('click', () => resultButtonHandler());
 cleanAll.addEventListener('click', () => cleanAllHandler());
 
 calculateWrapper.addEventListener('click', (evt) => {
-  const button = evt.target.closest('.button');
+  const outputValue = evt.target.closest('.button');
   const buttonNumber = evt.target.closest('.button-number');
   const operationButton = evt.target.closest('.button-operation');
 
-  button ? buttonHandler(button.value) : '';
+  outputValue ? buttonHandler(outputValue.value) : '';
 
   buttonNumber ? buttonNumberHaandler(buttonNumber.value) : '';
 
   operationButton ? buttonOperationHandler(operationButton.value) : '';
 
-  console.log(input, output, stack, currentNumber, sign, displayOutput, lastSign)
-  displayOperations.textContent = displayOutput.join('');
+  console.log(input, output, stack, currentNumber, sign, displayOutput, equals, additionalOperations)
 });
