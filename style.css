@@ -1,0 +1,118 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-size: 40px;
+  background-color: rgb(214, 223, 225);
+}
+
+.section {
+  width: 400px;
+  min-height: 450px;
+  margin: 0 auto;
+  border-radius: 5%;
+}
+
+.calculator-wrapper {
+  background-color: #cfd9dc;
+  max-width: 390px;
+  margin: 0 auto;
+  margin-top: 200px;
+  padding-left: 20px;
+  padding-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 90px);
+}
+
+.operations-field {
+  width: 350px;
+  background-color: rgb(214, 223, 225);
+  border-radius: 5px 5px 0 0;
+  padding-right: 10px;
+  margin-top: 20px;
+  grid-column: 1/-1;
+  display: flex;
+  justify-content: end;
+  flex-wrap: wrap;
+  font-size: 20px;
+  color: rgb(148, 150, 151);
+}
+
+.current-operations-field {
+  background-color: rgb(214, 223, 225);
+  border-radius: 0 0 5px 5px;
+  width: 350px;
+  padding: 0 10px 0 0;
+  grid-column: 1/-1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  margin-bottom: 30px;
+  font-size: 50px;
+  font-weight: 300;
+  word-break: break-all;
+}
+
+.buttons-and-additional-operations {
+  padding: 0;
+  margin: 0;
+  grid-column: 1/4;
+}
+
+.operations {
+  grid-column: 4/-1;
+  grid-row: 3/5;
+}
+
+.additional-operation,
+.result-button,
+.reset-operation,
+.del-one-char,
+.button-positive-negative,
+.button-number,
+.button-operation {
+  box-shadow: 0px 0px 10px 0px #888f91;
+  font-size: 20px;
+  padding: 0;
+  margin: 0;
+  width: 80px;
+  height: 50px;
+  cursor: pointer;
+}
+
+.result-button {
+height: 105px;
+margin-top: 4px;
+}
+
+.button {
+  border: none;
+  border-radius: 5%;
+  background:linear-gradient(to bottom, rgb(218, 235, 241) 5%, rgb(187, 201, 206) 100%);
+}
+
+.button:hover {
+  background:linear-gradient(to bottom, rgb(187, 201, 206) 5%, rgb(218, 235, 241) 100%);
+}
+
+.reset-operation {
+  background:linear-gradient(to bottom, rgb(255, 98, 0) 5%, rgb(171, 63, 10) 100%);
+}
+
+.reset-operation:hover {
+  background:linear-gradient(to bottom, rgb(171, 63, 10) 5%, rgb(255, 98, 0) 100%);
+}
+
+.button-positive-negative,
+.button-number {
+  background:linear-gradient(to bottom, rgb(238, 246, 248) 5%, rgb(193, 202, 203) 100%);
+}
+
+.button-positive-negative:hover,
+.button-number:hover {
+  background:linear-gradient(to bottom, rgb(193, 202, 203) 5%, rgb(238, 246, 248) 100%);
+}
+
