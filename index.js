@@ -25,7 +25,6 @@ const operators = {
 let input = [];
 let output = [];
 let stack = [];
-let displayOutput = [];
 
 let newNumber = false;
 let equals = false;
@@ -38,6 +37,9 @@ let string = '';
 
 const buttonHandler = (value) => {
   const lastValue = value;
+  if (value === '') {
+    return;
+  }
 
   if (outputValue.textContent === '0' && value === 'plusmn') {
     return
@@ -69,6 +71,7 @@ const buttonHandler = (value) => {
 
 // ввод чисел
 const buttonNumberHaandler = (number) => {
+  let num = '0.';
   if (equals) {
     cleanAllHandler();
   }
@@ -81,7 +84,7 @@ const buttonNumberHaandler = (number) => {
     currentNumber = outputValue.textContent;
   } else {
     newNumber = false;
-    outputValue.textContent = number;
+    number === '.' ? outputValue.textContent = num : outputValue.textContent = number;
     currentNumber = outputValue.textContent;
   }
 };
@@ -178,6 +181,7 @@ const getOperationResult = (output) => {
     '/': (x, y) => x / y,
     '%': (x, y) => x * (y / 100),
   };
+
   let stack = [];
 
   output.forEach((item) => {
@@ -189,6 +193,10 @@ const getOperationResult = (output) => {
     }
   });
   outputValue.textContent = stack.pop().toFixed(10);
+  if (outputValue.textContent === 'Infinity') {
+    outputValue.textContent = 'Нельзя делить на ноль';
+    return outputValue.textContent;
+  }
   return +outputValue.textContent;
 };
 
@@ -221,7 +229,6 @@ const squareRootHandler = () => {
 const cleanAllHandler = () => {
   outputValue.textContent = '0';
   outputFieldDisplay.textContent = '0';
-  displayOutput = [];
   newNumber = false;
   equals = false;
   additionalOperations = false;
@@ -238,17 +245,20 @@ const lastValueOfNumberHandler = () => {
   outputValue.textContent.length <= 1 ?
     intermediateNumber = 0 : intermediateNumber += outputValue.textContent.slice(0, -1);
   outputValue.textContent = intermediateNumber;
-  outputFieldDisplay.textContent = outputFieldDisplay.textContent.substring(0, outputFieldDisplay.textContent.length - 1);
   currentNumber = outputValue.textContent;
   intermediateNumber = '';
+
+    if (outputFieldDisplay.textContent.length > 1 ) {
+    outputFieldDisplay.textContent = outputFieldDisplay.textContent.substring(0, outputFieldDisplay.textContent.length - 1);
+  } else {
+    outputFieldDisplay.textContent = '0';
+  }
 };
 
 const positiveNegativeButtonHandler = () => {
   outputValue.textContent = -outputValue.textContent;
   currentNumber = outputValue.textContent;
   string = outputFieldDisplay.textContent;
-
-  console.log(string);
 };
 
 positiveNegativeButton.addEventListener('click', () => positiveNegativeButtonHandler());
@@ -270,5 +280,5 @@ calculateWrapper.addEventListener('click', (evt) => {
 
   operationButton ? buttonOperationHandler(operationButton.value) : '';
 
-  console.log(input, output, stack, currentNumber, sign, displayOutput, equals, additionalOperations)
+  console.log(input, output, stack, currentNumber, sign,  equals, additionalOperations,newNumber)
 });
