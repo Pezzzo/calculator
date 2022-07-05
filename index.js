@@ -33,40 +33,17 @@ let resultOperationSquare = 0;
 let currentNumber = 0;
 let intermediateNumber;
 let sign = '';
-let string = '';
 
 const buttonHandler = (value) => {
-  const lastValue = value;
-  if (value === '') {
+  if (outputFieldDisplay.textContent.includes('=')) {
     return;
   }
 
-  if (outputValue.textContent === '0' && value === 'plusmn') {
-    return
+  if (outputFieldDisplay.textContent === '0' && value) {
+    outputFieldDisplay.textContent = outputFieldDisplay.textContent.slice(1)
   }
-
-  if (
-    outputFieldDisplay.textContent.includes('(-)') && value === 'plusmn' ||
-    outputFieldDisplay.textContent.includes('=') ||
-    outputFieldDisplay.textContent.includes('square') && sign === '' ||
-    outputFieldDisplay.textContent.includes('%') && lastValue === '%' ||
-    outputFieldDisplay.textContent.includes('square root') && sign === ''
-    ) {
-      return;
-    }
-
-    outputFieldDisplay.textContent === '0' && value !== '.' ?
-    outputFieldDisplay.textContent = value : outputFieldDisplay.textContent += value;
-
-    string = outputFieldDisplay.textContent;
-
-
-  if (value === 'plusmn') {
-    if (currentNumber.includes('-')) {
-      outputFieldDisplay.textContent = string.replace(/plusmn/g, '(-)');
-    }
-    return;
-  }
+  outputFieldDisplay.textContent = outputFieldDisplay.textContent += value;
+console.log(outputFieldDisplay.textContent)
 };
 
 // ввод чисел
@@ -80,7 +57,7 @@ const buttonNumberHaandler = (number) => {
   }
   if (!newNumber) {
     outputValue.textContent === '0' && number !== '.' ?
-      outputValue.textContent = number : outputValue.textContent += number;
+    outputValue.textContent = number : outputValue.textContent += number;
     currentNumber = outputValue.textContent;
   } else {
     newNumber = false;
@@ -97,20 +74,20 @@ const buttonOperationHandler = (operation) => {
   if (operation === '+' || operation === '-' || operation === '*' || operation === '/') {
     outputValue.textContent = operation;
   }
-
   operation === '*' ? outputValue.textContent = signMultiply.textContent : '';
   operation === '/' ? outputValue.textContent = signdivide.textContent : '';
   operation === '-' ? outputValue.textContent = signminus.textContent : '';
-
-  input.push(Number(currentNumber))
+  if (sign !== '' && sign === operation) {
+    return;
+  }
+  input.push(Number(currentNumber));
   sign = operation;
   newNumber = true;
-  input.push(sign)
+  input.push(sign);
 }
 
 // получение результата
 const resultButtonHandler = () => {
-
   if (currentNumber === 0 || equals) {
     input = [];
     output = [];
@@ -130,6 +107,7 @@ const resultButtonHandler = () => {
     stack = [];
   }
   outputValue.textContent = getOperationResult(output);
+
   sign = '';
   equals = true;
 }
@@ -258,7 +236,6 @@ const lastValueOfNumberHandler = () => {
 const positiveNegativeButtonHandler = () => {
   outputValue.textContent = -outputValue.textContent;
   currentNumber = outputValue.textContent;
-  string = outputFieldDisplay.textContent;
 };
 
 positiveNegativeButton.addEventListener('click', () => positiveNegativeButtonHandler());
@@ -279,6 +256,9 @@ calculateWrapper.addEventListener('click', (evt) => {
   buttonNumber ? buttonNumberHaandler(buttonNumber.value) : '';
 
   operationButton ? buttonOperationHandler(operationButton.value) : '';
+  if (outputFieldDisplay.textContent === '0' && currentNumber !== 0) {
+    outputFieldDisplay.textContent = currentNumber
+  }
 
-  console.log(input, output, stack, currentNumber, sign,  equals, additionalOperations,newNumber)
+  console.log(input, output, stack, newNumber, currentNumber, additionalOperations, equals)
 });
