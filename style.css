@@ -38,6 +38,7 @@ body {
   justify-content: end;
   flex-wrap: wrap;
   font-size: 20px;
+  min-height: 24px;
   color: rgb(148, 150, 151);
 }
 
@@ -45,13 +46,14 @@ body {
   background-color: rgb(214, 223, 225);
   border-radius: 0 0 5px 5px;
   width: 350px;
+  min-height: 60px;
   padding: 0 10px 0 0;
   grid-column: 1/-1;
   display: flex;
   flex-wrap: wrap;
   justify-content: end;
   margin-bottom: 30px;
-  font-size: 50px;
+  font-size: 34px;
   font-weight: 300;
   word-break: break-all;
 }
@@ -66,6 +68,7 @@ body {
   grid-column: 4/-1;
   grid-row: 3/5;
 }
+
 
 .additional-operation,
 .result-button,
