@@ -13,11 +13,10 @@ body {
   width: 400px;
   min-height: 450px;
   margin: 0 auto;
-  border-radius: 5%;
 }
 
 .calculator-wrapper {
-  background-color: #cfd9dc;
+  /* background-color: #cfd9dc; */
   max-width: 390px;
   margin: 0 auto;
   margin-top: 200px;
@@ -69,7 +68,7 @@ body {
   grid-row: 3/5;
 }
 
-
+.button-parentheses,
 .additional-operation,
 .result-button,
 .reset-operation,
@@ -86,10 +85,7 @@ body {
   cursor: pointer;
 }
 
-.result-button {
-height: 105px;
-margin-top: 4px;
-}
+
 
 .button {
   border: none;
@@ -119,3 +115,10 @@ margin-top: 4px;
   background:linear-gradient(to bottom, rgb(193, 202, 203) 5%, rgb(238, 246, 248) 100%);
 }
 
+.result-button {
+  background:linear-gradient(to bottom, rgba(44, 76, 255, 0.696) 5%, rgba(70, 96, 245, 0.463) 100%);
+}
+
+.result-button:hover {
+    background:linear-gradient(to bottom, rgb(70, 96, 245, 0.463) 5%, rgb(44, 76, 255, 0.696) 100%);
+}

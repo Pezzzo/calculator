@@ -38,30 +38,21 @@ const buttonHandler = (value) => {
     return;
   }
 
-  if (value === '√' && outputFieldDisplay.textContent.length - 1 === '√' ||
-    value === '(' && display.length - 1 === '(') {
-    return;
-  }
-  if (value === '(') {
-    input.push(value);
-    display.push(value);
+  if (value === '√' && outputFieldDisplay.textContent.length - 1 === '√') {
+    return
   }
 
   if (value === 'plusmn') {
     return;
   }
 
-  if (value === '=' && lastSign === ')') {
-    display.push(value);
-    outputFieldDisplay.textContent = display.join(' ');
-  } else if (value === '=') {
+  if (value === '=') {
     display.push(currentNumber);
     display.push(value);
     outputFieldDisplay.textContent = display.join(' ');
   }
 
   if (!isNaN(value) || value === '.' && outputValue.textContent.includes('.')) {
-    value === '(' ? outputFieldDisplay.textContent = display.join(' ') :
     outputFieldDisplay.textContent = display.join(' ').concat(' ' + currentNumber);
   } else {
     outputFieldDisplay.textContent = display.join(' ');
@@ -96,16 +87,9 @@ const buttonOperationHandler = (operation) => {
   if (currentNumber === 0) {
     return;
   }
-  if (operation === '(') {
-    return;
-  }
 
   if (operation === '√' && display[display.length - 1] === '√') {
     return;
-  }
-  if (sign === ')') {
-    input.push(operation);
-    display.push(operation);
   }
 
   if (sign === '√') {
@@ -133,6 +117,7 @@ const buttonOperationHandler = (operation) => {
   newNumber = true;
   input.push(sign);
 
+
   if (sign === '√') {
     input.push(NaN);
     input.push('');
@@ -141,7 +126,6 @@ const buttonOperationHandler = (operation) => {
 
 // получение результата
 const resultButtonHandler = () => {
-
   if (currentNumber === 0 || equals) {
     input = [];
     output = [];
@@ -155,20 +139,24 @@ const resultButtonHandler = () => {
     display.pop();
   }
 
-  if (input[input.length - 1] !== currentNumber && input[input.length - 1] !== ')') {
-    currentNumber = outputValue.textContent;
-    input.push(Number(currentNumber));
-  }
-  console.log(stack);
+  currentNumber = outputValue.textContent;
+  input.push(Number(currentNumber));
+
   getReverseNotation(input);
+  if (stack.length === 3) {
+    output.push(stack[stack.length - 1]);
+    output.push(stack[1]);
+    output.push(stack[0]);
+    stack = [];
 
-  console.log(stack);
+  } else if (stack.length === 2) {
+    output.push(stack[stack.length - 1]);
+    output.push(stack[0]);
+    stack = [];
 
-  if (stack.length !== 0) {
-    while (stack.length > 0) {
-      output.push(stack[stack.length - 1]);
-      stack.pop();
-    }
+  } else {
+    output.push(stack[stack.length - 1]);
+    stack = [];
   }
 
   if (sign === '' && currentNumber !== 0) {
@@ -183,7 +171,6 @@ const resultButtonHandler = () => {
 
 // получение обратной нотации
 let getReverseNotation = (input) => {
-
   input.forEach((item) => {
 
     if (typeof item !== 'string') {
@@ -191,25 +178,29 @@ let getReverseNotation = (input) => {
     }
 
     if (typeof item === 'string') {
+
+      let firstEl = stack[0];
+      let secondEl = stack[1];
       let lastEl = stack[stack.length - 1];
 
       if (stack.length === 0) {
         stack.push(item);
       } else {
 
-        if (item === '(' || lastEl === '(') {
-          stack.push(item);
-        }
-
         if (operators[item] < operators[lastEl]) {
-          if (lastEl !== '(') {
+          if (stack.length === 3) {
             output.push(lastEl);
-            stack.pop();
-          }
-          stack.push(item);
-        }
+            output.push(secondEl);
+            output.push(firstEl);
 
-        if (operators[item] > operators[lastEl]) {
+          } else if (stack.length === 2) {
+            output.push(lastEl);
+            output.push(firstEl);
+
+          } else {
+            output.push(lastEl);
+          }
+          stack = [];
           stack.push(item);
         }
 
@@ -218,26 +209,15 @@ let getReverseNotation = (input) => {
           stack.pop();
           stack.push(item);
         }
-
-        if (stack[0] === '(' && stack[stack.length - 1] === ')') {
-          stack.pop();
+        if (operators[lastEl] < operators[item]) {
+          stack.push(item);
         }
-
-        if (item === ')') {
-          while (stack[stack.length - 1] !== '(') {
-            output.push(stack[stack.length - 1]);
-            stack.pop();
-          }
-          stack.pop();
-        }
-
-        console.log(stack);
-        console.log(output);
       }
     }
-    console.log(stack);
   });
+  console.log(input)
 };
+
 // выполнение операций
 const getOperationResult = (output) => {
   let stack = [];
@@ -283,7 +263,6 @@ const cleanAllHandler = () => {
   currentNumber = 0;
   sign = '';
   lastSign = '';
-
   input = [];
   output = [];
   stack = [];
@@ -304,11 +283,6 @@ const lastValueOfNumberHandler = () => {
   } else {
     outputFieldDisplay.textContent = '0';
   }
-
-  if (display[display.length - 1] === '(') {
-    display.pop();
-  }
-  console.log(outputFieldDisplay.textContent);
 };
 
 const positiveNegativeButtonHandler = () => {
