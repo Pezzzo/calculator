@@ -3,20 +3,20 @@
 const calculateWrapper = document.querySelector('.calculator-wrapper');
 const outputValue = document.querySelector('.current-operations-field');
 
+const squareRoot = document.querySelector('.square-root');
 const outputFieldDisplay = document.querySelector('.operations-field');
 const positiveNegativeButton = document.querySelector('.button-positive-negative');
 const lastValueOfNumber = document.querySelector('.del-one-char');
 const cleanAll = document.querySelector('.clean');
 const result = document.querySelector('.result-button');
 
-const operators = {
+const Operators = {
   '+': 1,
   '−': 1,
   '×': 2,
   '÷': 2,
   '%': 3,
   '^': 3,
-  '√': 3,
 };
 
 let input = [];
@@ -24,10 +24,14 @@ let output = [];
 let stack = [];
 let display = [];
 
+let resultNumber = '';
+let sqrt = false;
 let lastSign = '';
 let newNumber = false;
 let equals = false;
 let currentNumber = 0;
+let resultOperationSquare = 0;
+let lastNumber = '';
 let intermediateNumber;
 let sign = '';
 outputFieldDisplay.textContent = '0';
@@ -38,13 +42,19 @@ const buttonHandler = (value) => {
     return;
   }
 
-  if (value === '√' && outputFieldDisplay.textContent.length - 1 === '√' ||
-    value === '(' && display.length - 1 === '(') {
-    return;
+  if (value === '√' && !sqrt) {
+    lastSign = value;
+    sqrt = true;
+    display.push(lastNumber);
+    display.push(value);
+    outputFieldDisplay.textContent = display.join(' ');
   }
+
   if (value === '(') {
     input.push(value);
     display.push(value);
+    outputValue.textContent = value;
+    newNumber = true;
   }
 
   if (value === 'plusmn') {
@@ -60,11 +70,13 @@ const buttonHandler = (value) => {
     outputFieldDisplay.textContent = display.join(' ');
   }
 
-  if (!isNaN(value) || value === '.' && outputValue.textContent.includes('.')) {
-    value === '(' ? outputFieldDisplay.textContent = display.join(' ') :
-    outputFieldDisplay.textContent = display.join(' ').concat(' ' + currentNumber);
-  } else {
+
+  !isNaN(value) || value === '.' && outputValue.textContent.includes('.') ?
+    outputFieldDisplay.textContent = display.join(' ').concat(' ' + currentNumber) :
     outputFieldDisplay.textContent = display.join(' ');
+
+  if (value === '' && display[display.length - 1] === '(') {
+    outputFieldDisplay.textContent = outputFieldDisplay.textContent.slice(0, -1);
   }
 };
 
@@ -89,6 +101,7 @@ const buttonNumberHaandler = (number) => {
     number === '.' ? outputValue.textContent = num : outputValue.textContent = number;
     currentNumber = outputValue.textContent;
   }
+  lastNumber = currentNumber;
 };
 
 // ввод знака
@@ -96,20 +109,30 @@ const buttonOperationHandler = (operation) => {
   if (currentNumber === 0) {
     return;
   }
-  if (operation === '(') {
-    return;
-  }
 
-  if (operation === '√' && display[display.length - 1] === '√') {
-    return;
-  }
   if (sign === ')') {
     input.push(operation);
     display.push(operation);
   }
+  if (operation === '(') {
+    return;
+  }
 
-  if (sign === '√') {
-    display.push('√');
+  if (resultNumber !== '' && operation !== '') {
+    output = [];
+    input = [];
+    display = [];
+    currentNumber = resultNumber;
+
+    input.push(resultNumber);
+    display.push(resultNumber);
+    display.push(operation);
+    input.push(sign);
+
+    newNumber = true;
+    equals = false;
+    outputFieldDisplay.textContent = display.join(' ');
+    resultNumber = '';
   }
 
   outputValue.textContent = operation;
@@ -127,15 +150,18 @@ const buttonOperationHandler = (operation) => {
   }
 
   sign = operation;
+
   input.push(Number(currentNumber));
   display.push(currentNumber);
   display.push(operation);
   newNumber = true;
   input.push(sign);
 
-  if (sign === '√') {
-    input.push(NaN);
-    input.push('');
+  if (sqrt) {
+    display.pop();
+    display.pop();
+    display.push(operation);
+    sqrt = false;
   }
 };
 
@@ -148,6 +174,9 @@ const resultButtonHandler = () => {
     stack = [];
     return;
   }
+  if (lastSign === '√') {
+    outputFieldDisplay.textContent = display.join(' ').concat(' ' + '=');
+  }
 
   if (sign === '√') {
     input.pop();
@@ -156,13 +185,10 @@ const resultButtonHandler = () => {
   }
 
   if (input[input.length - 1] !== currentNumber && input[input.length - 1] !== ')') {
-    currentNumber = outputValue.textContent;
     input.push(Number(currentNumber));
   }
-  console.log(stack);
-  getReverseNotation(input);
 
-  console.log(stack);
+  getReverseNotation(input);
 
   if (stack.length !== 0) {
     while (stack.length > 0) {
@@ -170,12 +196,10 @@ const resultButtonHandler = () => {
       stack.pop();
     }
   }
+  sign === '' && currentNumber !== 0 ?
+    outputValue.textContent = +currentNumber : outputValue.textContent = getOperationResult(output);
 
-  if (sign === '' && currentNumber !== 0) {
-    outputValue.textContent = currentNumber;
-  } else {
-    outputValue.textContent = getOperationResult(output);
-  }
+  resultNumber = +outputValue.textContent;
 
   sign = '';
   equals = true;
@@ -183,13 +207,11 @@ const resultButtonHandler = () => {
 
 // получение обратной нотации
 let getReverseNotation = (input) => {
-
   input.forEach((item) => {
 
     if (typeof item !== 'string') {
       output.push(item)
     }
-
     if (typeof item === 'string') {
       let lastEl = stack[stack.length - 1];
 
@@ -197,11 +219,9 @@ let getReverseNotation = (input) => {
         stack.push(item);
       } else {
 
-        if (item === '(' || lastEl === '(') {
-          stack.push(item);
-        }
+        item === '(' || lastEl === '(' ? stack.push(item) : '';
 
-        if (operators[item] < operators[lastEl]) {
+        if (Operators[item] < Operators[lastEl]) {
           if (lastEl !== '(') {
             output.push(lastEl);
             stack.pop();
@@ -209,18 +229,16 @@ let getReverseNotation = (input) => {
           stack.push(item);
         }
 
-        if (operators[item] > operators[lastEl]) {
-          stack.push(item);
+        Operators[item] > Operators[lastEl] ? stack.push(item) : '';
+
+        if (lastEl === '(' && item === '(') {
+          return;
         }
 
-        if (operators[lastEl] === operators[item]) {
+        if (Operators[lastEl] === Operators[item]) {
           output.push(lastEl);
           stack.pop();
           stack.push(item);
-        }
-
-        if (stack[0] === '(' && stack[stack.length - 1] === ')') {
-          stack.pop();
         }
 
         if (item === ')') {
@@ -230,12 +248,8 @@ let getReverseNotation = (input) => {
           }
           stack.pop();
         }
-
-        console.log(stack);
-        console.log(output);
       }
     }
-    console.log(stack);
   });
 };
 // выполнение операций
@@ -249,7 +263,6 @@ const getOperationResult = (output) => {
     '÷': (x, y) => x / y,
     '%': (x, y) => x * (y / 100),
     '^': (x, y) => x ** y,
-    '√': (x) => Math.sqrt(x)
   };
 
   output.forEach((item) => {
@@ -280,10 +293,12 @@ const cleanAllHandler = () => {
   outputFieldDisplay.textContent = '0';
   newNumber = false;
   equals = false;
+  sqrt = false;
   currentNumber = 0;
+  lastNumber = '';
+  resultNumber = '';
   sign = '';
   lastSign = '';
-
   input = [];
   output = [];
   stack = [];
@@ -307,8 +322,26 @@ const lastValueOfNumberHandler = () => {
 
   if (display[display.length - 1] === '(') {
     display.pop();
+    input.pop();
   }
-  console.log(outputFieldDisplay.textContent);
+};
+
+let getResultOperationSquare = (num) => {
+  if (sqrt) {
+    return;
+  }
+  if (!Number.isInteger(num)) {
+    outputValue.textContent = +num.toFixed(10);
+  } else {
+    outputValue.textContent = num;
+  }
+  currentNumber = +outputValue.textContent;
+};
+
+
+const squareRootHandler = () => {
+  resultOperationSquare = Math.sqrt(outputValue.textContent);
+  getResultOperationSquare(resultOperationSquare);
 };
 
 const positiveNegativeButtonHandler = () => {
@@ -317,6 +350,7 @@ const positiveNegativeButtonHandler = () => {
   outputFieldDisplay.textContent = display.join(' ').concat(currentNumber);
 };
 
+squareRoot.addEventListener('click', squareRootHandler);
 positiveNegativeButton.addEventListener('click', () => positiveNegativeButtonHandler());
 lastValueOfNumber.addEventListener('click', lastValueOfNumberHandler);
 result.addEventListener('click', () => resultButtonHandler());
@@ -333,5 +367,5 @@ calculateWrapper.addEventListener('click', (evt) => {
 
   outputValue ? buttonHandler(outputValue.value) : '';
 
-  console.log(input, output, stack, newNumber, currentNumber, equals, sign, lastSign)
+  console.log(input, output, stack, newNumber, currentNumber, equals, sqrt, sign, lastSign)
 });
