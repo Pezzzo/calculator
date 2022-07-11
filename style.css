@@ -51,11 +51,25 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: end;
-  margin-bottom: 30px;
+  align-items: center;
   font-size: 34px;
   font-weight: 300;
   word-break: break-all;
 }
+
+.open-bracket {
+  color: rgb(148, 150, 151);
+  font-size: 14px;
+  margin-right: 62px;
+}
+
+.closing-bracket {
+  color: rgb(148, 150, 151);
+  font-size: 14px;
+  margin-right: 38px;
+}
+
+
 
 .buttons-and-additional-operations {
   padding: 0;
@@ -85,7 +99,9 @@ body {
   cursor: pointer;
 }
 
-
+.button-parentheses {
+  padding-left: 38px;
+  }
 
 .button {
   border: none;

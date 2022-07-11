@@ -3,6 +3,9 @@
 const calculateWrapper = document.querySelector('.calculator-wrapper');
 const outputValue = document.querySelector('.current-operations-field');
 
+const openBracket = document.querySelector('.open-bracket');
+const closingBracket = document.querySelector('.closing-bracket');
+
 const squareRoot = document.querySelector('.square-root');
 const outputFieldDisplay = document.querySelector('.operations-field');
 const positiveNegativeButton = document.querySelector('.button-positive-negative');
@@ -18,28 +21,43 @@ const Operators = {
   '%': 3,
   '^': 3,
 };
+// счётчик скобок
+const getBracketCount = (bracket, length) => {
+  let count = 0;
+  for (let i = 0; i < length; i++) {
+    if (input[i] === bracket) {
+      count++;
+    }
+  }
+  return count;
+};
 
 let input = [];
 let output = [];
 let stack = [];
 let display = [];
 
-let resultNumber = '';
 let sqrt = false;
-let lastSign = '';
 let newNumber = false;
 let equals = false;
+
+let resultNumber = '';
 let currentNumber = 0;
-let resultOperationSquare = 0;
 let lastNumber = '';
-let intermediateNumber;
 let sign = '';
+let lastSign = '';
+let intermediateNumber;
+let resultOperationSquare = 0;
 outputFieldDisplay.textContent = '0';
 
 // вывод всех операций
 const buttonHandler = (value) => {
   if (outputFieldDisplay.textContent.includes('=')) {
     return;
+  }
+
+  if (value === ')') {
+    closingBracket.textContent = `${getBracketCount(value, input.length)}`;
   }
 
   if (value === '√' && !sqrt) {
@@ -55,6 +73,7 @@ const buttonHandler = (value) => {
     display.push(value);
     outputValue.textContent = value;
     newNumber = true;
+    openBracket.textContent = `${getBracketCount(value, input.length)}`;
   }
 
   if (value === 'plusmn') {
@@ -70,14 +89,16 @@ const buttonHandler = (value) => {
     outputFieldDisplay.textContent = display.join(' ');
   }
 
-
   !isNaN(value) || value === '.' && outputValue.textContent.includes('.') ?
     outputFieldDisplay.textContent = display.join(' ').concat(' ' + currentNumber) :
     outputFieldDisplay.textContent = display.join(' ');
 
-  if (value === '' && display[display.length - 1] === '(') {
+  if (value === '' && display[display.length - 1] === '(' || value === '' && display[display.length - 1] === ')') {
     outputFieldDisplay.textContent = outputFieldDisplay.textContent.slice(0, -1);
   }
+
+  !outputFieldDisplay.textContent.includes('(') ? openBracket.textContent = '' : '';
+  !outputFieldDisplay.textContent.includes(')') ? closingBracket.textContent = '' : '';
 };
 
 // ввод чисел
@@ -167,6 +188,11 @@ const buttonOperationHandler = (operation) => {
 
 // получение результата
 const resultButtonHandler = () => {
+
+  if (openBracket.textContent !== closingBracket.textContent) {
+    outputValue.textContent = 'Ошибка';
+    return;
+  }
 
   if (currentNumber === 0 || equals) {
     input = [];
@@ -303,6 +329,8 @@ const cleanAllHandler = () => {
   output = [];
   stack = [];
   display = [];
+  closingBracket.textContent = '';
+  openBracket.textContent = '';
 };
 
 //сброс последнего символа
@@ -320,10 +348,12 @@ const lastValueOfNumberHandler = () => {
     outputFieldDisplay.textContent = '0';
   }
 
-  if (display[display.length - 1] === '(') {
+  if (display[display.length - 1] === '(' || display[display.length - 1] === ')') {
     display.pop();
     input.pop();
   }
+  openBracket.textContent = `${getBracketCount('(', input.length)}`;
+  closingBracket.textContent = `${getBracketCount(')', input.length)}`;
 };
 
 let getResultOperationSquare = (num) => {
