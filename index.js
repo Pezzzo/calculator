@@ -123,6 +123,10 @@ const buttonOperationHandler = (operation) => {
     return;
   }
 
+  if (getBracketCount(')', input.length) >= getBracketCount('(', input.length)) {
+    return;
+  }
+
   if (operation === '(') {
     return;
   }
@@ -157,7 +161,7 @@ const buttonOperationHandler = (operation) => {
     return;
   }
 
-  if (newNumber && operation !== '√') {
+  if (newNumber) {
 
     if (input[input.length - 1] === '√') {
       input.push(operation);
