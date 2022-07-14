@@ -28,7 +28,6 @@ let output = [];
 let stack = [];
 let display = [];
 
-let sqrt = false;
 let newNumber = false;
 let equals = false;
 
@@ -120,10 +119,6 @@ const buttonNumberHaandler = (number) => {
 // ввод знака
 const buttonOperationHandler = (operation) => {
   if (currentNumber === 0) {
-    return;
-  }
-
-  if (getBracketCount(')', input.length) >= getBracketCount('(', input.length)) {
     return;
   }
 
@@ -332,7 +327,6 @@ const cleanAllHandler = () => {
   outputFieldDisplay.textContent = '0';
   newNumber = false;
   equals = false;
-  sqrt = false;
   currentNumber = 0;
   resultNumber = '';
   sign = '';
@@ -395,5 +389,5 @@ calculateWrapper.addEventListener('click', (evt) => {
 
   outputValue ? buttonHandler(outputValue.value) : '';
 
-  console.log(input, output, stack, newNumber, currentNumber, equals, sqrt, sign, lastSign)
+  console.log(input, output, stack, newNumber, currentNumber, equals, sign, lastSign)
 });
