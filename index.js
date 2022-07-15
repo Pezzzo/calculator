@@ -6,7 +6,6 @@ const outputValue = document.querySelector('.current-operations-field');
 const openBracket = document.querySelector('.open-bracket');
 const closingBracket = document.querySelector('.closing-bracket');
 
-
 const outputFieldDisplay = document.querySelector('.operations-field');
 const positiveNegativeButton = document.querySelector('.button-positive-negative');
 const lastValueOfNumber = document.querySelector('.del-one-char');
@@ -26,7 +25,6 @@ const Operators = {
 let input = [];
 let output = [];
 let stack = [];
-let display = [];
 
 let newNumber = false;
 let equals = false;
@@ -34,8 +32,7 @@ let equals = false;
 let resultNumber = '';
 let currentNumber = 0;
 let sign = '';
-let lastSign = '';
-let intermediateNumber;
+let del = false;
 outputFieldDisplay.textContent = '0';
 
 // счётчик скобок
@@ -49,8 +46,32 @@ const getBracketCount = (bracket, length) => {
   return count;
 };
 
-// вывод всех операций
+// ввод скобок
+const getBracket = (value) => {
+  if (value === ')' && openBracket.textContent === closingBracket.textContent) {
+    return;
+  }
+  if (value === ')' && input[input.length - 1] === '√') {
+    input.pop();
+  }
+  if (newNumber && input[input.length - 1] !== '(') {
+    input.push(sign);
+  }
+  if (value === ')' &&
+    typeof input[input.length - 1] === 'string' &&
+    input[input.length - 1] !== ')' &&
+    input[input.length - 1] !== '√') {
+    input.push(Number(currentNumber));
+  }
+  input.push(value);
+};
+
+// вывод всех операций в дополнительное поле
 const buttonHandler = (value) => {
+  if (value === '=') {
+    outputFieldDisplay.textContent = input.join(' ').concat(' ' + value);
+  }
+
   if (outputFieldDisplay.textContent.includes('=')) {
     return;
   }
@@ -59,34 +80,42 @@ const buttonHandler = (value) => {
     return;
   }
 
-  if (value === '(') {
+  if (input[input.length - 1] !== '√' && value === '√') {
     input.push(value);
-    display.push(value);
+    outputFieldDisplay.textContent = input.join(' ');
+  }
+
+  if (value !== '') {
+    outputFieldDisplay.textContent = sign;
+  }
+
+  if (value === 'del' && input.length > 0) {
+    del = true;
+    outputValue.textContent = input[input.length - 1];
+  } else if (typeof input[input.length - 1] === 'number' && value !== '=' ||
+    value === '√' ||
+    input[input.length - 1] === '√' && value !== '√') {
+    outputValue.textContent = sign;
+  }
+
+  if (value === '(') {
     outputValue.textContent = value;
-    newNumber = true;
     openBracket.textContent = `${getBracketCount(value, input.length)}`;
   } else if (value === ')') {
+    outputValue.textContent = value;
     closingBracket.textContent = `${getBracketCount(value, input.length)}`;
   }
 
-  if (value === '=' && lastSign === ')') {
-    display.push(value);
-    outputFieldDisplay.textContent = display.join(' ');
-  } else if (value === '=') {
-    display.push(currentNumber);
-    display.push(value);
-    outputFieldDisplay.textContent = display.join(' ');
-  }
-
   if (!isNaN(value) || value === '.' && outputValue.textContent.includes('.')) {
-    outputFieldDisplay.textContent = display.join(' ').concat(' ' + currentNumber);
+    outputFieldDisplay.textContent = input.join(' ').concat(' ' + currentNumber);
   } else {
-    outputFieldDisplay.textContent = display.join(' ');
+    value !== '√' && value !== ')' && value !== '(' && value !== 'del' ?
+      outputFieldDisplay.textContent = input.join(' ').concat(' ' + sign) :
+      outputFieldDisplay.textContent = input.join(' ');
   }
 
-  if (value === '' && display[display.length - 1] === '(' ||
-    value === '' && display[display.length - 1] === ')') {
-    outputFieldDisplay.textContent = outputFieldDisplay.textContent.slice(0, -1);
+  if (value === 'del' && input.length === 0) {
+    outputFieldDisplay.textContent = outputValue.textContent;
   }
 
   !outputFieldDisplay.textContent.includes('(') ? openBracket.textContent = '' : '';
@@ -95,12 +124,23 @@ const buttonHandler = (value) => {
 
 // ввод чисел
 const buttonNumberHaandler = (number) => {
+  if (del) {
+    newNumber = true;
+    del = false;
+  } else if (newNumber && input[input.length - 1] !== '(') {
+    input.push(sign);
+  }
+
   let num = '0.';
+
+  if (input[input.length - 1] === '(') {
+    newNumber = true;
+  }
 
   equals ? cleanAllHandler() : '';
 
   if (number === '.' && outputValue.textContent.includes('.')) {
-    outputFieldDisplay.textContent = display.join(' ').concat('' + currentNumber);
+    outputFieldDisplay.textContent = input.join(' ').concat('' + currentNumber);
     return;
   }
 
@@ -118,90 +158,62 @@ const buttonNumberHaandler = (number) => {
 
 // ввод знака
 const buttonOperationHandler = (operation) => {
+  if (del) {
+    newNumber = true;
+    del = false;
+  }
+
   if (currentNumber === 0) {
     return;
   }
-
-  if (operation === '(') {
+  if (operation === '√' && input[input.length - 1] === '√') {
     return;
   }
 
-  if (sign === ')') {
-    input.push(operation);
-    display.push(operation);
+  if (operation === '(' || operation === ')') {
+    return;
   }
 
   if (resultNumber !== '' && operation !== '') {
     output = [];
     input = [];
-    display = [];
     currentNumber = resultNumber;
-
     input.push(resultNumber);
-    display.push(resultNumber);
-    display.push(operation);
-    input.push(sign);
 
     newNumber = true;
     equals = false;
-    outputFieldDisplay.textContent = display.join(' ');
+    outputFieldDisplay.textContent = input.join(' ');
     resultNumber = '';
   }
 
-  outputValue.textContent = operation;
   sign = operation;
-  lastSign = operation;
 
-  if (operation === '√' && input[input.length - 1] === '√') {
+  if (typeof input[input.length - 1] === 'number') {
     return;
   }
 
-  if (newNumber) {
+  if (input[input.length - 1] === '√' || input[input.length - 1] === ')') {
+    newNumber = true;
 
-    if (input[input.length - 1] === '√') {
-      input.push(operation);
-      display.push(operation);
-    }
-    input.pop();
-    input.push(operation);
-
-    display.pop();
-    display.push(operation);
-    outputFieldDisplay.textContent = display.join(' ');
-    return;
+  } else {
+    newNumber = true;
+    input.push(Number(currentNumber));
   }
-
-  sign = operation;
-
-  input.push(Number(currentNumber));
-  display.push(currentNumber);
-  display.push(operation);
-  newNumber = true;
-  input.push(sign);
 };
 
 // получение результата
 const resultButtonHandler = () => {
-
+  if (equals) {
+    return;
+  }
   if (openBracket.textContent !== closingBracket.textContent) {
     outputValue.textContent = 'Ошибка';
     return;
   }
 
-  if (currentNumber === 0 || equals) {
-    input = [];
-    output = [];
-    stack = [];
-    return;
-  }
-
-  lastSign === '√' ? outputFieldDisplay.textContent = display.join(' ').concat(' ' + '=') : '';
-
-  if (sign === '√') {
-    display.pop();
-  }
-
-  if (input[input.length - 1] !== currentNumber && input[input.length - 1] !== ')' && input[input.length - 1] !== '√') {
+  if (input[input.length - 1] !== currentNumber &&
+    input[input.length - 1] !== ')' &&
+    input[input.length - 1] !== '√') {
     input.push(Number(currentNumber));
   }
 
@@ -219,7 +231,6 @@ const resultButtonHandler = () => {
   } else {
     outputValue.textContent = getOperationResult(output);
   }
-
   resultNumber = +outputValue.textContent;
 
   sign = '';
@@ -310,7 +321,7 @@ const getOperationResult = (output) => {
   outputValue.textContent = stack.pop().toFixed(10);
 
   if (outputValue.textContent === 'Infinity') {
-    outputValue.textContent = 'Нельзя делить на ноль!';
+    outputValue.textContent = 'На 0 делить нельзя!';
     return outputValue.textContent;
   }
   if (outputValue.textContent === 'NaN') {
@@ -327,42 +338,34 @@ const cleanAllHandler = () => {
   outputFieldDisplay.textContent = '0';
   newNumber = false;
   equals = false;
+  del = false;
   currentNumber = 0;
   resultNumber = '';
   sign = '';
-  lastSign = '';
   input = [];
   output = [];
   stack = [];
-  display = [];
   closingBracket.textContent = '';
   openBracket.textContent = '';
 };
 
-//сброс последнего символа
+
+// удаление последнего элемента входного массива
 const lastValueOfNumberHandler = () => {
-  intermediateNumber = '';
-
-  if (outputValue.textContent.length <= 1) {
-    intermediateNumber = 0;
-  } else {
-    intermediateNumber += outputValue.textContent.slice(0, -1);
-  }
-
-  outputValue.textContent = intermediateNumber;
-  currentNumber = outputValue.textContent;
-  intermediateNumber = '';
-
-  if (outputFieldDisplay.textContent.length > 1) {
-    outputFieldDisplay.textContent = outputFieldDisplay.textContent.substring(0, outputFieldDisplay.textContent.length - 1);
-  } else {
-    outputFieldDisplay.textContent = '0';
-  }
-
-  if (display[display.length - 1] === '(' || display[display.length - 1] === ')') {
-    display.pop();
+  newNumber = false;
+  if (!del && input[input.length - 1] === '(' || !del && input[input.length - 1] === ')') {
     input.pop();
   }
+
+  if (del) {
+    input.pop();
+  }
+
+  if (input.length < 1) {
+    cleanAllHandler();
+    return;
+  }
+
   openBracket.textContent = `${getBracketCount('(', input.length)}`;
   closingBracket.textContent = `${getBracketCount(')', input.length)}`;
 };
@@ -370,18 +373,21 @@ const lastValueOfNumberHandler = () => {
 const positiveNegativeButtonHandler = () => {
   outputValue.textContent = -outputValue.textContent;
   currentNumber = outputValue.textContent;
-  outputFieldDisplay.textContent = display.join(' ').concat(currentNumber);
+  outputFieldDisplay.textContent = input.join(' ').concat(currentNumber);
 };
 
-positiveNegativeButton.addEventListener('click', () => positiveNegativeButtonHandler());
+positiveNegativeButton.addEventListener('click', positiveNegativeButtonHandler);
 lastValueOfNumber.addEventListener('click', lastValueOfNumberHandler);
-result.addEventListener('click', () => resultButtonHandler());
-cleanAll.addEventListener('click', () => cleanAllHandler());
+result.addEventListener('click', resultButtonHandler);
+cleanAll.addEventListener('click', cleanAllHandler);
 
 calculateWrapper.addEventListener('click', (evt) => {
+  const bracket = evt.target.closest('.button-parentheses');
   const outputValue = evt.target.closest('.button');
   const buttonNumber = evt.target.closest('.button-number');
   const operationButton = evt.target.closest('.button-operation');
+
+  bracket ? getBracket(bracket.value) : '';
 
   buttonNumber ? buttonNumberHaandler(buttonNumber.value) : '';
 
@@ -389,5 +395,5 @@ calculateWrapper.addEventListener('click', (evt) => {
 
   outputValue ? buttonHandler(outputValue.value) : '';
 
-  console.log(input, output, stack, newNumber, currentNumber, equals, sign, lastSign)
+  console.log(input, output, stack, newNumber, currentNumber, equals, sign, del)
 });
