@@ -100,6 +100,7 @@ const buttonHandler = (value) => {
 
   if (value === '(') {
     outputValue.textContent = value;
+    newNumber = true;
     openBracket.textContent = `${getBracketCount(value, input.length)}`;
   } else if (value === ')') {
     outputValue.textContent = value;
@@ -124,17 +125,13 @@ const buttonHandler = (value) => {
 
 // ввод чисел
 const buttonNumberHaandler = (number) => {
+  let num = '0.';
+
   if (del) {
     newNumber = true;
     del = false;
   } else if (newNumber && input[input.length - 1] !== '(') {
     input.push(sign);
-  }
-
-  let num = '0.';
-
-  if (input[input.length - 1] === '(') {
-    newNumber = true;
   }
 
   equals ? cleanAllHandler() : '';
@@ -145,6 +142,7 @@ const buttonNumberHaandler = (number) => {
   }
 
   if (!newNumber) {
+
     outputValue.textContent === '0' && number !== '.' ?
       outputValue.textContent = number : outputValue.textContent += number;
     currentNumber = outputValue.textContent;
