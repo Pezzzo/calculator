@@ -28,12 +28,17 @@ let stack = [];
 
 let newNumber = false;
 let equals = false;
+let sqrt = false;
 
 let resultNumber = '';
 let currentNumber = 0;
 let sign = '';
 let del = false;
 outputFieldDisplay.textContent = '0';
+
+if (inputValues.length === 0) {
+  outputFieldDisplay.textContent = '0';
+}
 
 // счётчик скобок
 const getBracketCount = (bracket, length) => {
@@ -79,14 +84,14 @@ const buttonHandler = (value) => {
   if (value === 'plusmn') {
     return;
   }
+  if (inputValues.length === 0 && value !== '' && currentNumber === 0) {
+    return;
+  }
 
   if (inputValues[inputValues.length - 1] !== '√' && value === '√') {
     inputValues.push(value);
     outputFieldDisplay.textContent = inputValues.join(' ');
-  }
-
-  if (value !== '') {
-    outputFieldDisplay.textContent = sign;
+    sqrt = true;
   }
 
   if (value === 'del' && inputValues.length > 0) {
@@ -108,12 +113,14 @@ const buttonHandler = (value) => {
   }
 
   if (!isNaN(value) || value === '.' && outputValueField.textContent.includes('.')) {
-    outputFieldDisplay.textContent = inputValues.join(' ').concat(' ' + currentNumber);
+    !sqrt ? outputFieldDisplay.textContent = inputValues.join(' ').concat(' ' + currentNumber) :
+      outputFieldDisplay.textContent = inputValues.join(' ');
   } else {
     value !== '√' && value !== ')' && value !== '(' && value !== 'del' ?
       outputFieldDisplay.textContent = inputValues.join(' ').concat(' ' + sign) :
       outputFieldDisplay.textContent = inputValues.join(' ');
   }
+
 
   if (value === 'del' && inputValues.length === 0) {
     outputFieldDisplay.textContent = outputValueField.textContent;
@@ -126,6 +133,10 @@ const buttonHandler = (value) => {
 // ввод чисел
 const buttonNumberHaandler = (number) => {
   let num = '0.';
+
+  if (sqrt) {
+    return;
+  }
 
   if (del) {
     newNumber = true;
@@ -156,19 +167,26 @@ const buttonNumberHaandler = (number) => {
 
 // ввод знака
 const buttonOperationHandler = (operation) => {
-  if (del) {
-    newNumber = true;
-    del = false;
+
+  if (inputValues[inputValues.length - 1] === '√' && operation !== '√') {
+    sqrt = false;
+  }
+
+  if (inputValues[inputValues.length - 1] === '√' && operation === '√') {
+    return;
   }
 
   if (operation === '(' || operation === ')') {
     return;
   }
+
   if (currentNumber === 0) {
     return;
   }
-  if (operation === '√' && inputValues[inputValues.length - 1] === '√') {
-    return;
+
+  if (del) {
+    newNumber = true;
+    del = false;
   }
 
   if (resultNumber !== '' && operation !== '') {
@@ -204,8 +222,11 @@ const buttonOperationHandler = (operation) => {
 
 // получение результата
 const resultButtonHandler = () => {
+  if (equals) {
+    return;
+  }
   if (openBracket.textContent !== closingBracket.textContent ||
-    equals || typeof inputValues[inputValues.length - 1] === 'number') {
+    typeof inputValues[inputValues.length - 1] === 'number') {
     outputValueField.textContent = 'Ошибка';
     return;
   }
@@ -300,7 +321,7 @@ const getOperationResult = () => {
     '−': (x, y) => x - y,
     '×': (x, y) => x * y,
     '÷': (x, y) => x / y,
-    '%': (x, y) => x * (y / 100),
+    '%': (x, y) => x * y / 100,
     '^': (x, y) => x ** y,
   };
 
@@ -339,6 +360,7 @@ const cleanAllHandler = () => {
   newNumber = false;
   equals = false;
   del = false;
+  sqrt = false;
   currentNumber = 0;
   resultNumber = '';
   sign = '';
@@ -352,6 +374,10 @@ const cleanAllHandler = () => {
 
 // удаление последнего элемента входного массива
 const lastValueOfNumberHandler = () => {
+  if (inputValues[inputValues.length - 1] === '√') {
+    inputValues.pop();
+  sqrt = false;
+  }
   newNumber = false;
 
   if (del) {
@@ -394,5 +420,5 @@ calculateWrapper.addEventListener('click', (evt) => {
 
   outputValue ? buttonHandler(outputValue.value) : '';
 
-  console.log(inputValues, outputValues, stack, newNumber, currentNumber, equals, sign, del)
+  console.log(inputValues, outputValues, stack, currentNumber, sign, newNumber, equals, del, sqrt)
 });
