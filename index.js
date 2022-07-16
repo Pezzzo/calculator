@@ -1,7 +1,7 @@
 'use strict';
 
 const calculateWrapper = document.querySelector('.calculator-wrapper');
-const outputValue = document.querySelector('.current-operations-field');
+const outputValueField = document.querySelector('.current-operations-field');
 
 const openBracket = document.querySelector('.open-bracket');
 const closingBracket = document.querySelector('.closing-bracket');
@@ -22,8 +22,8 @@ const Operators = {
   '√': 3,
 };
 
-let input = [];
-let output = [];
+let inputValues = [];
+let outputValues = [];
 let stack = [];
 
 let newNumber = false;
@@ -39,7 +39,7 @@ outputFieldDisplay.textContent = '0';
 const getBracketCount = (bracket, length) => {
   let count = 0;
   for (let i = 0; i < length; i++) {
-    if (input[i] === bracket) {
+    if (inputValues[i] === bracket) {
       count++;
     }
   }
@@ -51,27 +51,27 @@ const getBracket = (value) => {
   if (value === ')' && openBracket.textContent === closingBracket.textContent) {
     return;
   }
-  if (value === ')' && input[input.length - 1] === '√') {
-    input.pop();
+  if (value === ')' && inputValues[inputValues.length - 1] === '√') {
+    inputValues.pop();
   }
-  if (newNumber && input[input.length - 1] !== '(') {
-    input.push(sign);
+  if (newNumber && inputValues[inputValues.length - 1] !== '(') {
+    inputValues.push(sign);
   }
   if (value === ')' &&
-    typeof input[input.length - 1] === 'string' &&
-    input[input.length - 1] !== ')' &&
-    input[input.length - 1] !== '√') {
-    input.push(Number(currentNumber));
+    typeof inputValues[inputValues.length - 1] === 'string' &&
+    inputValues[inputValues.length - 1] !== ')' &&
+    inputValues[inputValues.length - 1] !== '√') {
+    inputValues.push(Number(currentNumber));
   }
-  input.push(value);
+  inputValues.push(value);
 };
 
 // вывод всех операций в дополнительное поле
 const buttonHandler = (value) => {
-  if (value === '=') {
-    outputFieldDisplay.textContent = input.join(' ').concat(' ' + value);
+  if (value === '=' && inputValues[inputValues.length - 1] === '(' ||
+    value === '=' && inputValues[inputValues.length - 1] === sign) {
+    return;
   }
-
   if (outputFieldDisplay.textContent.includes('=')) {
     return;
   }
@@ -80,43 +80,43 @@ const buttonHandler = (value) => {
     return;
   }
 
-  if (input[input.length - 1] !== '√' && value === '√') {
-    input.push(value);
-    outputFieldDisplay.textContent = input.join(' ');
+  if (inputValues[inputValues.length - 1] !== '√' && value === '√') {
+    inputValues.push(value);
+    outputFieldDisplay.textContent = inputValues.join(' ');
   }
 
   if (value !== '') {
     outputFieldDisplay.textContent = sign;
   }
 
-  if (value === 'del' && input.length > 0) {
+  if (value === 'del' && inputValues.length > 0) {
     del = true;
-    outputValue.textContent = input[input.length - 1];
-  } else if (typeof input[input.length - 1] === 'number' && value !== '=' ||
+    outputValueField.textContent = inputValues[inputValues.length - 1];
+  } else if (typeof inputValues[inputValues.length - 1] === 'number' && value !== '=' ||
     value === '√' ||
-    input[input.length - 1] === '√' && value !== '√') {
-    outputValue.textContent = sign;
+    inputValues[inputValues.length - 1] === '√' && value !== '√') {
+    outputValueField.textContent = sign;
   }
 
   if (value === '(') {
-    outputValue.textContent = value;
+    outputValueField.textContent = value;
     newNumber = true;
-    openBracket.textContent = `${getBracketCount(value, input.length)}`;
+    openBracket.textContent = `${getBracketCount(value, inputValues.length)}`;
   } else if (value === ')') {
-    outputValue.textContent = value;
-    closingBracket.textContent = `${getBracketCount(value, input.length)}`;
+    outputValueField.textContent = value;
+    closingBracket.textContent = `${getBracketCount(value, inputValues.length)}`;
   }
 
-  if (!isNaN(value) || value === '.' && outputValue.textContent.includes('.')) {
-    outputFieldDisplay.textContent = input.join(' ').concat(' ' + currentNumber);
+  if (!isNaN(value) || value === '.' && outputValueField.textContent.includes('.')) {
+    outputFieldDisplay.textContent = inputValues.join(' ').concat(' ' + currentNumber);
   } else {
     value !== '√' && value !== ')' && value !== '(' && value !== 'del' ?
-      outputFieldDisplay.textContent = input.join(' ').concat(' ' + sign) :
-      outputFieldDisplay.textContent = input.join(' ');
+      outputFieldDisplay.textContent = inputValues.join(' ').concat(' ' + sign) :
+      outputFieldDisplay.textContent = inputValues.join(' ');
   }
 
-  if (value === 'del' && input.length === 0) {
-    outputFieldDisplay.textContent = outputValue.textContent;
+  if (value === 'del' && inputValues.length === 0) {
+    outputFieldDisplay.textContent = outputValueField.textContent;
   }
 
   !outputFieldDisplay.textContent.includes('(') ? openBracket.textContent = '' : '';
@@ -130,27 +130,27 @@ const buttonNumberHaandler = (number) => {
   if (del) {
     newNumber = true;
     del = false;
-  } else if (newNumber && input[input.length - 1] !== '(') {
-    input.push(sign);
+  } else if (newNumber && inputValues[inputValues.length - 1] !== '(') {
+    inputValues.push(sign);
   }
 
   equals ? cleanAllHandler() : '';
 
-  if (number === '.' && outputValue.textContent.includes('.')) {
-    outputFieldDisplay.textContent = input.join(' ').concat('' + currentNumber);
+  if (number === '.' && outputValueField.textContent.includes('.')) {
+    outputFieldDisplay.textContent = inputValues.join(' ').concat('' + currentNumber);
     return;
   }
 
   if (!newNumber) {
 
-    outputValue.textContent === '0' && number !== '.' ?
-      outputValue.textContent = number : outputValue.textContent += number;
-    currentNumber = outputValue.textContent;
+    outputValueField.textContent === '0' && number !== '.' ?
+      outputValueField.textContent = number : outputValueField.textContent += number;
+    currentNumber = outputValueField.textContent;
 
   } else {
     newNumber = false;
-    number === '.' ? outputValue.textContent = num : outputValue.textContent = number;
-    currentNumber = outputValue.textContent;
+    number === '.' ? outputValueField.textContent = num : outputValueField.textContent = number;
+    currentNumber = outputValueField.textContent;
   }
 };
 
@@ -161,87 +161,91 @@ const buttonOperationHandler = (operation) => {
     del = false;
   }
 
+  if (operation === '(' || operation === ')') {
+    return;
+  }
   if (currentNumber === 0) {
     return;
   }
-  if (operation === '√' && input[input.length - 1] === '√') {
-    return;
-  }
-
-  if (operation === '(' || operation === ')') {
+  if (operation === '√' && inputValues[inputValues.length - 1] === '√') {
     return;
   }
 
   if (resultNumber !== '' && operation !== '') {
-    output = [];
-    input = [];
+    outputValues = [];
+    inputValues = [];
     currentNumber = resultNumber;
-    input.push(resultNumber);
+    inputValues.push(resultNumber);
 
     newNumber = true;
     equals = false;
-    outputFieldDisplay.textContent = input.join(' ');
+    outputFieldDisplay.textContent = inputValues.join(' ');
     resultNumber = '';
   }
 
   sign = operation;
 
-  if (typeof input[input.length - 1] === 'number') {
+  if (typeof inputValues[inputValues.length - 1] === 'number') {
     return;
   }
 
-  if (input[input.length - 1] === '√' || input[input.length - 1] === ')') {
-    newNumber = true;
+  if (outputFieldDisplay.textContent.slice(-1) === '(' && operation !== '(') {
+    outputFieldDisplay.textContent = inputValues.join(' ');
+    return;
+  }
 
+  if (inputValues[inputValues.length - 1] === '√' || inputValues[inputValues.length - 1] === ')') {
+    newNumber = true;
   } else {
     newNumber = true;
-    input.push(Number(currentNumber));
+    inputValues.push(Number(currentNumber));
   }
 };
 
 // получение результата
 const resultButtonHandler = () => {
-  if (equals) {
-    return;
-  }
-  if (openBracket.textContent !== closingBracket.textContent) {
-    outputValue.textContent = 'Ошибка';
+  if (openBracket.textContent !== closingBracket.textContent ||
+    equals || typeof inputValues[inputValues.length - 1] === 'number') {
+    outputValueField.textContent = 'Ошибка';
     return;
   }
 
-  if (input[input.length - 1] !== currentNumber &&
-    input[input.length - 1] !== ')' &&
-    input[input.length - 1] !== '√') {
-    input.push(Number(currentNumber));
+  if (inputValues[inputValues.length - 1] !== currentNumber &&
+    inputValues[inputValues.length - 1] !== ')' &&
+    inputValues[inputValues.length - 1] !== '√') {
+    inputValues.push(Number(currentNumber));
+  }
+  if (inputValues[inputValues.length - 1] !== Number) {
+    outputFieldDisplay.textContent = inputValues.join(' ').concat(' ' + '=');
   }
 
-  getReverseNotation(input);
+  getReverseNotation(inputValues);
 
   if (stack.length !== 0) {
     while (stack.length > 0) {
-      output.push(stack[stack.length - 1]);
+      outputValues.push(stack[stack.length - 1]);
       stack.pop();
     }
   }
 
   if (sign === '' && currentNumber !== 0) {
-    outputValue.textContent = +currentNumber;
+    outputValueField.textContent = +currentNumber;
   } else {
-    outputValue.textContent = getOperationResult(output);
+    outputValueField.textContent = getOperationResult(outputValues);
   }
-  resultNumber = +outputValue.textContent;
+  resultNumber = +outputValueField.textContent;
 
   sign = '';
   equals = true;
 };
 
 // получение обратной нотации
-let getReverseNotation = (input) => {
+let getReverseNotation = () => {
 
-  input.forEach((item) => {
+  inputValues.forEach((item) => {
 
     if (typeof item !== 'string') {
-      output.push(item);
+      outputValues.push(item);
     }
     if (typeof item === 'string') {
       let lastEl = stack[stack.length - 1];
@@ -256,7 +260,7 @@ let getReverseNotation = (input) => {
         if (Operators[item] < Operators[lastEl]) {
 
           while (Operators[item] <= Operators[stack[stack.length - 1]]) {
-            output.push(stack[stack.length - 1]);
+            outputValues.push(stack[stack.length - 1]);
             stack.pop();
           }
           stack.push(item);
@@ -271,26 +275,24 @@ let getReverseNotation = (input) => {
         }
 
         if (Operators[lastEl] === Operators[item]) {
-          output.push(lastEl);
+          outputValues.push(lastEl);
           stack.pop();
           stack.push(item);
         }
 
         if (item === ')') {
           while (stack[stack.length - 1] !== '(') {
-            output.push(stack[stack.length - 1]);
+            outputValues.push(stack[stack.length - 1]);
             stack.pop();
           }
           stack.pop();
         }
       }
-      console.log(stack)
-      console.log(input)
     }
   });
 };
 // выполнение операций
-const getOperationResult = (output) => {
+const getOperationResult = () => {
   let stack = [];
 
   const operations = {
@@ -302,37 +304,37 @@ const getOperationResult = (output) => {
     '^': (x, y) => x ** y,
   };
 
-  output.forEach((item) => {
+  outputValues.forEach((item) => {
     if (item in operations) {
       let [y, x] = [stack.pop(), stack.pop()];
       stack.push(operations[item](x, y));
     }
     else if (item === '√') {
-      let z = stack.pop();
-      stack.push(Math.sqrt(z));
+      let x = stack.pop();
+      stack.push(Math.sqrt(x));
     }
     else {
       stack.push(parseFloat(item));
     }
   });
 
-  outputValue.textContent = stack.pop().toFixed(10);
+  outputValueField.textContent = stack.pop().toFixed(10);
 
-  if (outputValue.textContent === 'Infinity') {
-    outputValue.textContent = 'На 0 делить нельзя!';
-    return outputValue.textContent;
+  if (outputValueField.textContent === 'Infinity') {
+    outputValueField.textContent = 'На 0 делить нельзя!';
+    return outputValueField.textContent;
   }
-  if (outputValue.textContent === 'NaN') {
-    outputValue.textContent = 'Ошибка';
-    return outputValue.textContent;
+  if (outputValueField.textContent === 'NaN') {
+    outputValueField.textContent = 'Ошибка';
+    return outputValueField.textContent;
   }
 
-  return +outputValue.textContent;
+  return +outputValueField.textContent;
 };
 
 // общий сброс
 const cleanAllHandler = () => {
-  outputValue.textContent = '0';
+  outputValueField.textContent = '0';
   outputFieldDisplay.textContent = '0';
   newNumber = false;
   equals = false;
@@ -340,8 +342,8 @@ const cleanAllHandler = () => {
   currentNumber = 0;
   resultNumber = '';
   sign = '';
-  input = [];
-  output = [];
+  inputValues = [];
+  outputValues = [];
   stack = [];
   closingBracket.textContent = '';
   openBracket.textContent = '';
@@ -351,27 +353,26 @@ const cleanAllHandler = () => {
 // удаление последнего элемента входного массива
 const lastValueOfNumberHandler = () => {
   newNumber = false;
-  if (!del && input[input.length - 1] === '(' || !del && input[input.length - 1] === ')') {
-    input.pop();
-  }
 
   if (del) {
-    input.pop();
+    inputValues.pop();
+  } else if (!del && inputValues[inputValues.length - 1] === '(' || !del && inputValues[inputValues.length - 1] === ')') {
+    inputValues.pop();
   }
 
-  if (input.length < 1) {
+  if (inputValues.length < 1) {
     cleanAllHandler();
     return;
   }
 
-  openBracket.textContent = `${getBracketCount('(', input.length)}`;
-  closingBracket.textContent = `${getBracketCount(')', input.length)}`;
+  openBracket.textContent = `${getBracketCount('(', inputValues.length)}`;
+  closingBracket.textContent = `${getBracketCount(')', inputValues.length)}`;
 };
 
 const positiveNegativeButtonHandler = () => {
-  outputValue.textContent = -outputValue.textContent;
-  currentNumber = outputValue.textContent;
-  outputFieldDisplay.textContent = input.join(' ').concat(currentNumber);
+  outputValueField.textContent = -outputValueField.textContent;
+  currentNumber = outputValueField.textContent;
+  outputFieldDisplay.textContent = inputValues.join(' ').concat(currentNumber);
 };
 
 positiveNegativeButton.addEventListener('click', positiveNegativeButtonHandler);
@@ -393,5 +394,5 @@ calculateWrapper.addEventListener('click', (evt) => {
 
   outputValue ? buttonHandler(outputValue.value) : '';
 
-  console.log(input, output, stack, newNumber, currentNumber, equals, sign, del)
+  console.log(inputValues, outputValues, stack, newNumber, currentNumber, equals, sign, del)
 });
