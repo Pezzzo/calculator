@@ -34,11 +34,8 @@ let resultNumber = '';
 let currentNumber = 0;
 let sign = '';
 let del = false;
-outputFieldDisplay.textContent = '0';
 
-if (inputValues.length === 0) {
-  outputFieldDisplay.textContent = '0';
-}
+outputFieldDisplay.textContent = '0';
 
 // счётчик скобок
 const getBracketCount = (bracket, length) => {
@@ -137,7 +134,7 @@ const buttonHandler = (value) => {
 
 // ввод чисел
 const buttonNumberHaandler = (number) => {
-  let num = '0.';
+  let decimalFirst = '0.';
 
   if (sqrt) {
     return;
@@ -163,7 +160,7 @@ const buttonNumberHaandler = (number) => {
     currentNumber = outputValueField.textContent;
   } else {
     newNumber = false;
-    number === '.' ? outputValueField.textContent = num : outputValueField.textContent = number;
+    number === '.' ? outputValueField.textContent = decimalFirst : outputValueField.textContent = number;
     currentNumber = outputValueField.textContent;
   }
 };
@@ -172,17 +169,11 @@ const buttonNumberHaandler = (number) => {
 const buttonOperationHandler = (operation) => {
   if (inputValues[inputValues.length - 1] === '√' && operation !== '√') {
     sqrt = false;
-  }
-
-  if (inputValues[inputValues.length - 1] === '√' && operation === '√') {
+  } else if (inputValues[inputValues.length - 1] === '√' && operation === '√') {
     return;
   }
 
-  if (operation === '(' || operation === ')') {
-    return;
-  }
-
-  if (currentNumber === 0) {
+  if (operation === '(' || operation === ')' || currentNumber === 0) {
     return;
   }
 
@@ -386,7 +377,7 @@ const cleanAllHandler = () => {
 const lastValueOfNumberHandler = () => {
   if (inputValues[inputValues.length - 1] === '√') {
     inputValues.pop();
-  sqrt = false;
+    sqrt = false;
   }
 
   newNumber = false;
@@ -430,6 +421,4 @@ calculateWrapper.addEventListener('click', (evt) => {
   operationButton ? buttonOperationHandler(operationButton.value) : '';
 
   outputValue ? buttonHandler(outputValue.value) : '';
-
-  console.log(inputValues, outputValues, stack, currentNumber, sign, newNumber, equals, del, sqrt)
 });
