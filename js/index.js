@@ -29,13 +29,14 @@ let stack = [];
 let newNumber = false;
 let equals = false;
 let sqrt = false;
-
-let resultNumber = '';
-let currentNumber = 0;
-let sign = '';
 let del = false;
 
+let resultNumber = '';
+let sign = '';
+let currentNumber = 0;
+
 outputFieldDisplay.textContent = '0';
+
 
 // счётчик скобок
 const getBracketCount = (bracket, length) => {
@@ -47,6 +48,7 @@ const getBracketCount = (bracket, length) => {
   }
   return count;
 };
+
 
 // ввод скобок
 const getBracket = (value) => {
@@ -71,6 +73,7 @@ const getBracket = (value) => {
 
   inputValues.push(value);
 };
+
 
 // вывод всех операций в дополнительное поле
 const buttonHandler = (value) => {
@@ -132,6 +135,7 @@ const buttonHandler = (value) => {
   !outputFieldDisplay.textContent.includes(')') ? closingBracket.textContent = '' : '';
 };
 
+
 // ввод чисел
 const buttonNumberHaandler = (number) => {
   let decimalFirst = '0.';
@@ -164,6 +168,7 @@ const buttonNumberHaandler = (number) => {
     currentNumber = outputValueField.textContent;
   }
 };
+
 
 // ввод знака
 const buttonOperationHandler = (operation) => {
@@ -213,6 +218,7 @@ const buttonOperationHandler = (operation) => {
   }
 };
 
+
 // получение результата
 const resultButtonHandler = () => {
   if (equals) {
@@ -255,6 +261,7 @@ const resultButtonHandler = () => {
   sign = '';
   equals = true;
 };
+
 
 // получение обратной нотации
 let getReverseNotation = () => {
@@ -314,6 +321,8 @@ let getReverseNotation = () => {
     }
   });
 };
+
+
 // выполнение операций
 const getOperationResult = () => {
   let stack = [];
@@ -353,6 +362,7 @@ const getOperationResult = () => {
 
   return +outputValueField.textContent;
 };
+
 
 // общий сброс
 const cleanAllHandler = () => {
