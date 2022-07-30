@@ -105,40 +105,61 @@ body {
 
 .button-parentheses {
   padding-left: 38px;
-  }
+}
 
 .button {
   border: none;
   border-radius: 5%;
-  background:linear-gradient(to bottom, rgb(218, 235, 241) 5%, rgb(187, 201, 206) 100%);
-}
-
-.button:hover {
-  background:linear-gradient(to bottom, rgb(187, 201, 206) 5%, rgb(218, 235, 241) 100%);
+  background: linear-gradient(to bottom, rgb(218, 235, 241) 5%, rgb(187, 201, 206) 100%);
 }
 
 .reset-operation {
-  background:linear-gradient(to bottom, rgb(255, 98, 0) 5%, rgb(171, 63, 10) 100%);
-}
-
-.reset-operation:hover {
-  background:linear-gradient(to bottom, rgb(171, 63, 10) 5%, rgb(255, 98, 0) 100%);
+  background: linear-gradient(to bottom, rgb(255, 98, 0) 5%, rgb(171, 63, 10) 100%);
 }
 
 .button-positive-negative,
 .button-number {
-  background:linear-gradient(to bottom, rgb(238, 246, 248) 5%, rgb(193, 202, 203) 100%);
-}
-
-.button-positive-negative:hover,
-.button-number:hover {
-  background:linear-gradient(to bottom, rgb(193, 202, 203) 5%, rgb(238, 246, 248) 100%);
+  background: linear-gradient(to bottom, rgb(238, 246, 248) 5%, rgb(193, 202, 203) 100%);
 }
 
 .result-button {
-  background:linear-gradient(to bottom, rgba(44, 76, 255, 0.696) 5%, rgba(70, 96, 245, 0.463) 100%);
+  background: linear-gradient(to bottom, rgba(44, 76, 255, 0.696) 5%, rgba(70, 96, 245, 0.463) 100%);
 }
 
-.result-button:hover {
-    background:linear-gradient(to bottom, rgb(70, 96, 245, 0.463) 5%, rgb(44, 76, 255, 0.696) 100%);
+@media (max-width: 1024px) {
+  .button:active {
+    background: linear-gradient(to bottom, rgb(187, 201, 206) 5%, rgb(218, 235, 241) 100%);
+  }
+
+  .reset-operation:active {
+    background: linear-gradient(to bottom, rgb(171, 63, 10) 5%, rgb(255, 98, 0) 100%);
+  }
+
+  .button-positive-negative:active,
+  .button-number:active {
+    background: linear-gradient(to bottom, rgb(193, 202, 203) 5%, rgb(238, 246, 248) 100%);
+  }
+
+  .result-button:active {
+    background: linear-gradient(to bottom, rgb(70, 96, 245, 0.463) 5%, rgb(44, 76, 255, 0.696) 100%);
+  }
+}
+
+@media (min-width: 1024px) {
+  .button:hover {
+    background: linear-gradient(to bottom, rgb(187, 201, 206) 5%, rgb(218, 235, 241) 100%);
+  }
+
+  .reset-operation:hover {
+    background: linear-gradient(to bottom, rgb(171, 63, 10) 5%, rgb(255, 98, 0) 100%);
+  }
+
+  .button-positive-negative:hover,
+  .button-number:hover {
+    background: linear-gradient(to bottom, rgb(193, 202, 203) 5%, rgb(238, 246, 248) 100%);
+  }
+
+  .result-button:hover {
+    background: linear-gradient(to bottom, rgb(70, 96, 245, 0.463) 5%, rgb(44, 76, 255, 0.696) 100%);
+  }
 }
