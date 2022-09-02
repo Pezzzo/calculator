@@ -4,13 +4,17 @@ const calculateWrapper = document.querySelector('.calculator-wrapper');
 const outputValueField = document.querySelector('.current-operations-field');
 
 const openBracket = document.querySelector('.open-bracket');
-const closingBracket = document.querySelector('.closing-bracket');
+const closeBracket = document.querySelector('.closing-bracket');
 
 const outputFieldDisplay = document.querySelector('.operations-field');
 const positiveNegativeButton = document.querySelector('.button-positive-negative');
 const lastValueOfNumber = document.querySelector('.del-one-char');
 const cleanAll = document.querySelector('.clean');
 const result = document.querySelector('.result-button');
+
+const OPEN_BRACKET = '(';
+const CLOSE_BRACKET = ')';
+const SQUARE_ROOT = '√';
 
 const Operators = {
   '+': 1,
@@ -52,49 +56,39 @@ const getBracketCount = (bracket, length) => {
 
 // ввод скобок
 const getBracket = (value) => {
-  if (value === ')' && openBracket.textContent === closingBracket.textContent) {
+  if (value === CLOSE_BRACKET && openBracket.textContent === closeBracket.textContent) {
     return;
   }
 
-  if (value === ')' && inputValues[inputValues.length - 1] === '√') {
+  if (value === CLOSE_BRACKET && inputValues[inputValues.length - 1] === SQUARE_ROOT) {
     inputValues.pop();
   }
 
-  if (newNumber && inputValues[inputValues.length - 1] !== '(') {
+  if (newNumber && inputValues[inputValues.length - 1] !== OPEN_BRACKET) {
     inputValues.push(sign);
   }
 
-  if (value === ')' &&
+  if (value === CLOSE_BRACKET &&
     typeof inputValues[inputValues.length - 1] === 'string' &&
-    inputValues[inputValues.length - 1] !== ')' &&
-    inputValues[inputValues.length - 1] !== '√') {
+    inputValues[inputValues.length - 1] !== CLOSE_BRACKET &&
+    inputValues[inputValues.length - 1] !== SQUARE_ROOT) {
     inputValues.push(Number(currentNumber));
   }
 
   inputValues.push(value);
 };
 
-
 // вывод всех операций в дополнительное поле
 const buttonHandler = (value) => {
-  if (value === '=' && inputValues[inputValues.length - 1] === '(' ||
-    value === '=' && inputValues[inputValues.length - 1] === sign) {
+  if (value === '=' && inputValues[inputValues.length - 1] === OPEN_BRACKET ||
+    value === '=' && inputValues[inputValues.length - 1] === sign ||
+    outputFieldDisplay.textContent.includes('=') ||
+    value === 'plusmn' ||
+    inputValues.length === 0 && value !== '' && currentNumber === 0) {
     return;
   }
 
-  if (outputFieldDisplay.textContent.includes('=')) {
-    return;
-  }
-
-  if (value === 'plusmn') {
-    return;
-  }
-
-  if (inputValues.length === 0 && value !== '' && currentNumber === 0) {
-    return;
-  }
-
-  if (inputValues[inputValues.length - 1] !== '√' && value === '√') {
+  if (inputValues[inputValues.length - 1] !== SQUARE_ROOT && value === SQUARE_ROOT) {
     inputValues.push(value);
     outputFieldDisplay.textContent = inputValues.join(' ');
     sqrt = true;
@@ -104,25 +98,25 @@ const buttonHandler = (value) => {
     del = true;
     outputValueField.textContent = inputValues[inputValues.length - 1];
   } else if (typeof inputValues[inputValues.length - 1] === 'number' && value !== '=' ||
-    value === '√' ||
-    inputValues[inputValues.length - 1] === '√' && value !== '√') {
+    value === SQUARE_ROOT ||
+    inputValues[inputValues.length - 1] === SQUARE_ROOT && value !== SQUARE_ROOT) {
     outputValueField.textContent = sign;
   }
 
-  if (value === '(') {
+  if (value === OPEN_BRACKET) {
     outputValueField.textContent = value;
     newNumber = true;
     openBracket.textContent = `${getBracketCount(value, inputValues.length)}`;
-  } else if (value === ')') {
+  } else if (value === CLOSE_BRACKET) {
     outputValueField.textContent = value;
-    closingBracket.textContent = `${getBracketCount(value, inputValues.length)}`;
+    closeBracket.textContent = `${getBracketCount(value, inputValues.length)}`;
   }
 
   if (!isNaN(value) || value === '.' && outputValueField.textContent.includes('.')) {
     !sqrt ? outputFieldDisplay.textContent = inputValues.join(' ').concat(' ' + currentNumber) :
       outputFieldDisplay.textContent = inputValues.join(' ');
   } else {
-    value !== '√' && value !== ')' && value !== '(' && value !== 'del' ?
+    value !== SQUARE_ROOT && value !== CLOSE_BRACKET && value !== OPEN_BRACKET && value !== 'del' ?
       outputFieldDisplay.textContent = inputValues.join(' ').concat(' ' + sign) :
       outputFieldDisplay.textContent = inputValues.join(' ');
   }
@@ -131,8 +125,8 @@ const buttonHandler = (value) => {
     outputFieldDisplay.textContent = outputValueField.textContent;
   }
 
-  !outputFieldDisplay.textContent.includes('(') ? openBracket.textContent = '' : '';
-  !outputFieldDisplay.textContent.includes(')') ? closingBracket.textContent = '' : '';
+  !outputFieldDisplay.textContent.includes(OPEN_BRACKET) ? openBracket.textContent = '' : '';
+  !outputFieldDisplay.textContent.includes(CLOSE_BRACKET) ? closeBracket.textContent = '' : '';
 };
 
 
@@ -147,7 +141,7 @@ const buttonNumberHaandler = (number) => {
   if (del) {
     newNumber = true;
     del = false;
-  } else if (newNumber && inputValues[inputValues.length - 1] !== '(') {
+  } else if (newNumber && inputValues[inputValues.length - 1] !== OPEN_BRACKET) {
     inputValues.push(sign);
   }
 
@@ -172,13 +166,13 @@ const buttonNumberHaandler = (number) => {
 
 // ввод знака
 const buttonOperationHandler = (operation) => {
-  if (inputValues[inputValues.length - 1] === '√' && operation !== '√') {
+  if (inputValues[inputValues.length - 1] === SQUARE_ROOT && operation !== SQUARE_ROOT) {
     sqrt = false;
-  } else if (inputValues[inputValues.length - 1] === '√' && operation === '√') {
+  } else if (inputValues[inputValues.length - 1] === SQUARE_ROOT && operation === SQUARE_ROOT) {
     return;
   }
 
-  if (operation === '(' || operation === ')' || currentNumber === 0) {
+  if (operation === OPEN_BRACKET || operation === CLOSE_BRACKET || currentNumber === 0) {
     return;
   }
 
@@ -205,12 +199,12 @@ const buttonOperationHandler = (operation) => {
     return;
   }
 
-  if (outputFieldDisplay.textContent.slice(-1) === '(' && operation !== '(') {
+  if (outputFieldDisplay.textContent.slice(-1) === OPEN_BRACKET && operation !== OPEN_BRACKET) {
     outputFieldDisplay.textContent = inputValues.join(' ');
     return;
   }
 
-  if (inputValues[inputValues.length - 1] === '√' || inputValues[inputValues.length - 1] === ')') {
+  if (inputValues[inputValues.length - 1] === SQUARE_ROOT || inputValues[inputValues.length - 1] === CLOSE_BRACKET) {
     newNumber = true;
   } else {
     newNumber = true;
@@ -221,23 +215,26 @@ const buttonOperationHandler = (operation) => {
 
 // получение результата
 const resultButtonHandler = () => {
+
+  let lastValue = inputValues[inputValues.length - 1];
+
   if (equals) {
     return;
   }
 
-  if (openBracket.textContent !== closingBracket.textContent ||
-    typeof inputValues[inputValues.length - 1] === 'number') {
+  if (openBracket.textContent !== closeBracket.textContent ||
+    typeof lastValue === 'number') {
     outputValueField.textContent = 'Ошибка';
     return;
   }
 
-  if (inputValues[inputValues.length - 1] !== currentNumber &&
-    inputValues[inputValues.length - 1] !== ')' &&
-    inputValues[inputValues.length - 1] !== '√') {
+  if (lastValue !== currentNumber &&
+    lastValue !== CLOSE_BRACKET &&
+    lastValue !== SQUARE_ROOT) {
     inputValues.push(Number(currentNumber));
   }
 
-  if (inputValues[inputValues.length - 1] !== Number) {
+  if (lastValue !== Number) {
     outputFieldDisplay.textContent = inputValues.join(' ').concat(' ' + '=');
   }
 
@@ -278,12 +275,12 @@ let getReverseNotation = () => {
         stack.push(item);
 
       } else {
-        if (item === ')' && lastEl === '(') {
+        if (item === CLOSE_BRACKET && lastEl === OPEN_BRACKET) {
           stack.pop();
           return;
         }
 
-        if (item === '(' || lastEl === '(') {
+        if (item === OPEN_BRACKET || lastEl === OPEN_BRACKET) {
           stack.push(item);
         }
 
@@ -300,7 +297,7 @@ let getReverseNotation = () => {
           stack.push(item)
         }
 
-        if (lastEl === '(' && item === '(') {
+        if (lastEl === OPEN_BRACKET && item === OPEN_BRACKET) {
           return;
         }
 
@@ -310,8 +307,8 @@ let getReverseNotation = () => {
           stack.push(item);
         }
 
-        if (item === ')') {
-          while (stack[stack.length - 1] !== '(') {
+        if (item === CLOSE_BRACKET) {
+          while (stack[stack.length - 1] !== OPEN_BRACKET) {
             outputValues.push(stack[stack.length - 1]);
             stack.pop();
           }
@@ -325,6 +322,7 @@ let getReverseNotation = () => {
 
 // выполнение операций
 const getOperationResult = () => {
+  const MAX_LENGTH = 10;
   let stack = [];
 
   const operations = {
@@ -340,7 +338,7 @@ const getOperationResult = () => {
     if (item in operations) {
       let [y, x] = [stack.pop(), stack.pop()];
       stack.push(operations[item](x, y));
-    } else if (item === '√') {
+    } else if (item === SQUARE_ROOT) {
       let x = stack.pop();
       stack.push(Math.sqrt(x));
     } else {
@@ -348,7 +346,7 @@ const getOperationResult = () => {
     }
   });
 
-  outputValueField.textContent = stack.pop().toFixed(10);
+  outputValueField.textContent = stack.pop().toFixed(MAX_LENGTH);
 
   if (outputValueField.textContent === 'Infinity') {
     outputValueField.textContent = 'На 0 делить нельзя!';
@@ -378,14 +376,14 @@ const cleanAllHandler = () => {
   inputValues = [];
   outputValues = [];
   stack = [];
-  closingBracket.textContent = '';
+  closeBracket.textContent = '';
   openBracket.textContent = '';
 };
 
 
 // удаление последнего элемента входного массива
 const lastValueOfNumberHandler = () => {
-  if (inputValues[inputValues.length - 1] === '√') {
+  if (inputValues[inputValues.length - 1] === SQUARE_ROOT) {
     inputValues.pop();
     sqrt = false;
   }
@@ -394,7 +392,7 @@ const lastValueOfNumberHandler = () => {
 
   if (del) {
     inputValues.pop();
-  } else if (!del && inputValues[inputValues.length - 1] === '(' || !del && inputValues[inputValues.length - 1] === ')') {
+  } else if (!del && inputValues[inputValues.length - 1] === OPEN_BRACKET || !del && inputValues[inputValues.length - 1] === CLOSE_BRACKET) {
     inputValues.pop();
   }
 
@@ -403,8 +401,8 @@ const lastValueOfNumberHandler = () => {
     return;
   }
 
-  openBracket.textContent = `${getBracketCount('(', inputValues.length)}`;
-  closingBracket.textContent = `${getBracketCount(')', inputValues.length)}`;
+  openBracket.textContent = `${getBracketCount(OPEN_BRACKET, inputValues.length)}`;
+  closeBracket.textContent = `${getBracketCount(CLOSE_BRACKET, inputValues.length)}`;
 };
 
 const positiveNegativeButtonHandler = () => {
@@ -424,11 +422,11 @@ calculateWrapper.addEventListener('click', (evt) => {
   const buttonNumber = evt.target.closest('.button-number');
   const operationButton = evt.target.closest('.button-operation');
 
-  bracket ? getBracket(bracket.value) : '';
+  bracket ? getBracket(bracket.value) : null;
 
-  buttonNumber ? buttonNumberHaandler(buttonNumber.value) : '';
+  buttonNumber ? buttonNumberHaandler(buttonNumber.value) : null;
 
-  operationButton ? buttonOperationHandler(operationButton.value) : '';
+  operationButton ? buttonOperationHandler(operationButton.value) : null;
 
-  outputValue ? buttonHandler(outputValue.value) : '';
+  outputValue ? buttonHandler(outputValue.value) : null;
 });
