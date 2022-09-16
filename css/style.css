@@ -123,7 +123,7 @@ body {
 }
 
 .result-button {
-  background: linear-gradient(to bottom, rgba(44, 76, 255, 0.696) 5%, rgba(70, 96, 245, 0.463) 100%);
+  background: linear-gradient(to bottom, rgbargba(70, 96, 245, 0.463) 5%, rgba(44, 76, 255, 0.696) 100%);
 }
 
 @media (max-width: 1024px) {

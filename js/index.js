@@ -238,7 +238,7 @@ const resultButtonHandler = () => {
     outputFieldDisplay.textContent = inputValues.join(' ').concat(' ' + '=');
   }
 
-  getReverseNotation(inputValues);
+  getReverseNotation();
 
   if (stack.length !== 0) {
     while (stack.length > 0) {
@@ -250,7 +250,7 @@ const resultButtonHandler = () => {
   if (sign === '' && currentNumber !== 0) {
     outputValueField.textContent = +currentNumber;
   } else {
-    outputValueField.textContent = getOperationResult(outputValues);
+    outputValueField.textContent = getOperationResult();
   }
 
   resultNumber = +outputValueField.textContent;
@@ -392,7 +392,10 @@ const lastValueOfNumberHandler = () => {
 
   if (del) {
     inputValues.pop();
-  } else if (!del && inputValues[inputValues.length - 1] === OPEN_BRACKET || !del && inputValues[inputValues.length - 1] === CLOSE_BRACKET) {
+  } else if (
+    !del && inputValues[inputValues.length - 1] === OPEN_BRACKET ||
+    !del && inputValues[inputValues.length - 1] === CLOSE_BRACKET
+  ) {
     inputValues.pop();
   }
 
@@ -422,11 +425,11 @@ calculateWrapper.addEventListener('click', (evt) => {
   const buttonNumber = evt.target.closest('.button-number');
   const operationButton = evt.target.closest('.button-operation');
 
-  bracket ? getBracket(bracket.value) : null;
+  bracket ? getBracket(bracket.value) : '';
 
-  buttonNumber ? buttonNumberHaandler(buttonNumber.value) : null;
+  buttonNumber ? buttonNumberHaandler(buttonNumber.value) : '';
 
-  operationButton ? buttonOperationHandler(operationButton.value) : null;
+  operationButton ? buttonOperationHandler(operationButton.value) : '';
 
-  outputValue ? buttonHandler(outputValue.value) : null;
+  outputValue ? buttonHandler(outputValue.value) : '';
 });
